@@ -10,6 +10,8 @@ void Mymap::insert(int newkey, int newvalue) {
 				current = current->right;
 			else {
 				current->right = new Node(newkey, newvalue);
+				current->right->parent = current;
+				current = current->right;
 				break;
 			}
 		}
@@ -18,15 +20,15 @@ void Mymap::insert(int newkey, int newvalue) {
 				current = current->left;
 			else {
 				current->left = new Node(newkey, newvalue);
+				current->left->parent = current;
+				current = current->left;
 				break;
 			}
 		}
 		else throw std::invalid_argument("Keys must be different!!");
-		/*while (!current->parent->isblack)
-			current->parent;*/
 		while (current->parent)
-			if (current->parent->parent)
-				if (!current->parent->isblack && current->parent->parent->left == current->parent) {
+			if (current->parent->parent && !current->parent->isblack) {
+				if (current->parent->parent->left == current->parent) {
 					if (current->parent->parent->right)
 						if (!current->parent->parent->right->isblack) {
 							current->parent->isblack = true;
@@ -34,24 +36,43 @@ void Mymap::insert(int newkey, int newvalue) {
 							current->parent->parent->isblack = false;
 							current = current->parent->parent;
 						}
-						else break;
-					else break;
-					if (current == current->parent->right) {
-						left_turn(current);
-						current = current->left;
-					}
-					if(current->parent)
+					if (current->parent) {
+						if (current->parent->isblack)
+							break;
+						if (current == current->parent->right) {
+							left_turn(current);
+							current = current->left;
+						}
+						if (current->parent->isblack)
+							break;
 						if (current->parent->parent) {
 							current->parent->isblack = true;
 							current->parent->parent->isblack = false;
+							right_turn(current->parent);
 						}
+					}
 				}
-				else if(current->parent->isblack)
-					break;
+				else if (current->parent == current->parent->parent->right) {
+					if (!current->parent->parent->left->isblack) {
+						current->parent->parent->left->isblack = true;
+						current->parent->parent->right->isblack = true;
+						current->parent->parent->isblack = false;
+						current = current->parent->parent;
+					}
+					else if (current->parent->left == current) {
+						right_turn(current);
+						current = current->left;
+						current->isblack = true;
+						current->parent->isblack = false;
+						left_turn(current->parent);
+					}
+				}
+			}
 			else break;
 		while (current->parent)
 			current = current->parent;
-		current->isblack = true;
+		head = current;
+		head->isblack = true;
 	}
 }
 
