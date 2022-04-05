@@ -21,9 +21,15 @@
     <ClCompile Include="Mymap.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Listnum.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mymap.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Listnum.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

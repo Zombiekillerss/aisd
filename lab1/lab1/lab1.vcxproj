@@ -140,9 +140,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="lab1.cpp" />
+    <ClCompile Include="Listnum.cpp" />
     <ClCompile Include="Mymap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Listnum.h" />
     <ClInclude Include="Mymap.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
