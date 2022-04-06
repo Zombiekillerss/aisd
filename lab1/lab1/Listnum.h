@@ -20,6 +20,8 @@ public:
     void set(size_t index, int newnumber);
     bool isEmpty();
     void push_front(Listnum newlist);
+    void save_list();
+    Listnum& operator=(Listnum Listnum);
     friend ostream& operator<< (ostream& out, const Listnum& list);
 private:
     class Node {
@@ -34,4 +36,5 @@ private:
     };
     Node* head;
     size_t size;
+    size_t savesize;
 };

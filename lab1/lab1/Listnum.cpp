@@ -17,6 +17,7 @@ void Listnum::push_back(int newnumber) {
         current->next = new Node(newnumber); // adds newnumber to the end of the list
     }
     size++;
+    savesize = size;
 }
 
 void Listnum::push_front(int newnumber) {
@@ -27,6 +28,7 @@ void Listnum::push_front(int newnumber) {
         head = first; // the list is updated
     }
     size++;
+    savesize = size;
 }
 
 void Listnum::pop_back() {
@@ -42,6 +44,7 @@ void Listnum::pop_back() {
         if (previous) previous->next = current; // updates the pointer
         else head = nullptr;
         size--;
+        savesize = size;
     }
 }
 
@@ -51,6 +54,7 @@ void Listnum::pop_front() {
         delete head;
         head = current;
         size--;
+        savesize = size;
     }
 }
 
@@ -65,6 +69,7 @@ void Listnum::insert(int newnumber, size_t index) {
             newelem->next = current->next; // insert the list item before index element
             current->next = newelem;
             size++;
+            savesize = size;
         }
     }
 }
@@ -101,6 +106,7 @@ void Listnum::remove(size_t index) {
             delete next;
             next = nullptr;
             size--;
+            savesize = size;
         }
     }
 }
@@ -110,7 +116,7 @@ size_t Listnum::get_size() {
 }
 
 void Listnum::clear() {
-    while (size) pop_front();
+    while (size && head) pop_front();
 }
 
 void Listnum::set(size_t index, int newnumber) {
@@ -153,7 +159,23 @@ void Listnum::push_front(Listnum newlist) {
         clear(); // the head is cleared
         head = main.head;
         size = main.size;
+        savesize = size;
         main.size = 0; // since size = 0 the destructor will not delete the memory
         newlist.size = 0; // since size = 0 the destructor will not delete the memory
     }
+}
+
+void Listnum::save_list()
+{
+    size = 0;
+}
+
+Listnum& Listnum::operator=(Listnum list)
+{
+    this->head = list.head;
+    list.head = nullptr;
+    this->size = list.savesize;
+    this->savesize = list.savesize;
+    list.size = 0;
+    return *this;
 }

@@ -106,11 +106,9 @@ void Mymap::remove(int key) {
 			continue;
 		}
 	}
-	if (current) {
-		if (current == nill)
-			throw std::invalid_argument("Keys must be different!!");
-	}
-	else throw std::invalid_argument("Keys must be different!!");
+	if (!current)
+		throw std::invalid_argument("array is empty!!!!");
+	else if(current == nill) throw std::invalid_argument("key not found!!!");
 	if (current != nill) {
 		remove = current;
 		isblackremove = remove->isblack;
@@ -193,7 +191,7 @@ void Mymap::remove(int key) {
 				if (remove->parent->left == remove)
 					remove->parent->left = current;
 				else
-					remove->parent->right == current;
+					remove->parent->right = current;
 			}
 			current->left = remove->left;
 			if (remove->left->parent != nill)
@@ -207,8 +205,6 @@ void Mymap::remove(int key) {
 			delete remove;
 		}
 	}
-	if(current == nill && head)
-		throw std::invalid_argument("Keys must be different!!");
 	if (isblackremove && head && currentforbalance) {
 		while (currentforbalance->parent) {
 			if (currentforbalance->parent->left == currentforbalance) {
@@ -287,7 +283,7 @@ int Mymap::find(int key) {
 		else break;
 	}
 	if (current == nill)
-		throw std::invalid_argument("lol");
+		throw std::invalid_argument("Key not found!!");
 	return current->value;
 }
 
@@ -300,7 +296,7 @@ Listnum Mymap::get_values() {
 }
 
 void Mymap::clear() {
-	while (head != nill)
+	while (head != nill && head)
 		remove(head->key);
 }
 
@@ -395,6 +391,7 @@ Listnum Mymap::get_keys_or_value(bool iskeys) {
 				}
 			}
 		}
+		list.save_list();
 		return list;
 	}
 	throw out_of_range("the tree does not exist!");
