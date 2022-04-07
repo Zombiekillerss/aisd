@@ -7,7 +7,7 @@ int main()
 	Mymap map;
 	Listnum maplist;
 	for (int i = 0; i < 6; i++) {
-		map.insert(key[i], value);
+		map.insert(key[i], key[i]);
 	}
-	maplist = map.get_keys();
+	map.print();
 }

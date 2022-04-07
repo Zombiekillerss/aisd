@@ -92,7 +92,7 @@ namespace UnitTestforlaba1 {
 		TEST_METHOD(TestGetList) {
 			int value = 50, key[] = { 55,40,65,60,75,57 };
 			Mymap map;
-			Listnum maplist;
+			Listnum maplist, maplist1;
 			try {
 				maplist = map.get_keys();
 				Assert::IsTrue(false);
@@ -101,12 +101,16 @@ namespace UnitTestforlaba1 {
 				Assert::AreEqual(expection.what(), "the tree does not exist!");
 			}
 			for (int i = 0; i < 6; i++) {
-				map.insert(key[i], value);
+				map.insert(key[i], key[i]);
 			}
 			maplist = map.get_keys();
 			Assert::IsTrue(maplist.contains(55) && maplist.contains(40) && maplist.contains(65)
 				&& maplist.contains(60) && maplist.contains(75) && maplist.contains(57)
 				&& maplist.get_size() == 6);
+			maplist1 = map.get_values();
+			Assert::IsTrue(maplist1.contains(55) && maplist1.contains(40) && maplist1.contains(65)
+				&& maplist1.contains(60) && maplist1.contains(75) && maplist1.contains(57)
+				&& maplist1.get_size() == 6);
 		}
 	};
 }
