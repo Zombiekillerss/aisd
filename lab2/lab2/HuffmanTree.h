@@ -25,17 +25,20 @@ private:
 		bool rightvalue;
 		NodeT(char newsymbol, int newvalue)
 		{
-			this->root = nullptr;
-			this->left = nullptr;
-			this->right = nullptr;
-			this->symbol = newsymbol;
+			root = nullptr;
+			left = nullptr;
+			right = nullptr;
+			symbol = newsymbol;
 			value = newvalue;
 			leftvalue = 0;
-			rightvalue = 0;
+			rightvalue = 1;
 		}
 	};
 	MyList<NodeT*> listnode;
+	Mymap<char, MyBitArr> codesym;
 	size_t count = 0;
 	NodeT* head = nullptr;
+	Mymap<char, size_t> countchars(std::string);
+	size_t countstr(std::string, char);
 };
 

@@ -18,7 +18,7 @@ public:
     bool contains(T value);
     T get_elem(size_t index);
     void remove(size_t index);
-    void remove(T);
+    void removeel(T);
     size_t get_size();
     void clear();
     void set(size_t index, T newvalue);
@@ -190,7 +190,7 @@ void MyList<T>::remove(size_t index)
 }
 
 template<typename T>
-inline void MyList<T>::remove(T elem)
+inline void MyList<T>::removeel(T elem)
 {
     if (size && contains(elem))
     {
@@ -206,8 +206,8 @@ inline void MyList<T>::remove(T elem)
             current->next = next->next;
             delete next;
             next = nullptr;
+            size--;
         }
-        size--;
     }
 }
 

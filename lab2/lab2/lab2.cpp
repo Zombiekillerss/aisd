@@ -1,17 +1,13 @@
 ﻿#include <iostream>
 #include "Mymap.h"
+#include "HuffmanTree.h"
 using namespace std;
 
 int main()
 {
-	Mymap<int, MyList<bool>> map;
-	MyList<bool> t;
-	t.push_back(0);
-	t.push_back(1);
-	t.push_back(0);
-	t.push_back(1);
-	t.push_back(0);
-	t.push_back(1);
-	map.insert(1, t);
+	HuffmanT huf;
+	std::string str = "lollll";
+	std::cout << str.length();
+	huf.encoding(str);
 	return 0;
 }

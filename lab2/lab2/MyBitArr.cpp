@@ -15,6 +15,11 @@ void MyBitArr::addNewBit(bool newBit)
 	boolArr.push_front(newBit);
 }
 
+void MyBitArr::deletbitend()
+{
+	boolArr.pop_back();
+}
+
 void MyBitArr::clear()
 {
 	boolArr.clear();

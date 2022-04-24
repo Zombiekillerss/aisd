@@ -6,12 +6,17 @@ template<typename T1, typename T2>
 class Mymap 
 {
 public:
+	Mymap() {};
+	Mymap(const Mymap<T1, T2>&);
+	Mymap& operator=(Mymap<T1,T2>);
 	~Mymap();
 	void insert(T1 key, T2 value);
 	void remove(T1 key);
-	T2* find(T1 key);
+	bool contains(T1 key);
+	T2 find(T1 key);
 	MyList<T1> get_keys();
 	MyList<T2> get_values();
+	int get_size();
 	void clear();
 	void print();
 private:
@@ -44,10 +49,38 @@ private:
 };
 
 template<typename T1, typename T2>
+inline Mymap<T1, T2>::Mymap(const Mymap<T1, T2>& map)
+{
+	head = map.head;
+	count = map.count;
+	nill = map.nill;
+	MyList<T1> listt1 = get_keys();
+	MyList<T2> listt2 = get_values();
+	head = nullptr;
+	count = 0;
+	nill = nullptr;
+	for(int i =0;i<listt1.get_size();i++)
+		insert(listt1.get_elem(i),listt2.get_elem(i));
+}
+
+template<typename T1, typename T2>
+Mymap<T1,T2>& Mymap<T1, T2>::operator=(Mymap<T1,T2> map)
+{
+	head = map.head;
+	count = map.count;
+	nill = map.nill;
+	map.head = nullptr;
+	map.count = 0;
+	map.nill = nullptr;
+	return *this;
+}
+
+template<typename T1, typename T2>
 Mymap<T1, T2>::~Mymap() 
 {
 	clear();
-	delete nill;
+	if (nill)
+		delete nill;
 	nill = nullptr;
 }
 
@@ -172,7 +205,8 @@ void Mymap<T1, T2>::remove(T1 key)
 	}
 	if (!current)
 		throw std::invalid_argument("array is empty!!!!");
-	else if (current == nill) throw std::invalid_argument("key not found!!!");
+	else if (current == nill)
+		throw std::invalid_argument("key not found!!!");
 	if (current != nill) 
 	{
 		remove = current;
@@ -365,7 +399,24 @@ void Mymap<T1, T2>::remove(T1 key)
 }
 
 template<typename T1, typename T2>
-T2* Mymap<T1, T2>::find(T1 key) 
+inline bool Mymap<T1, T2>::contains(T1 key)
+{
+	Node* current = head;
+	while (current != nill && current)
+	{
+		if (key < current->key)
+			current = current->left;
+		else if (key > current->key)
+			current = current->right;
+		else break;
+	}
+	if (current == nill || !current)
+		return false;
+	return true;
+}
+
+template<typename T1, typename T2>
+T2 Mymap<T1, T2>::find(T1 key) 
 {
 	Node* current = head;
 	while (current != nill) 
@@ -391,6 +442,12 @@ template<typename T1, typename T2>
 MyList<T2> Mymap<T1, T2>::get_values() 
 {
 	return get_keys_or_value<MyList<T2>>(false);
+}
+
+template<typename T1, typename T2>
+inline int Mymap<T1, T2>::get_size()
+{
+	return count;
 }
 
 template<typename T1, typename T2>
@@ -500,24 +557,23 @@ T3 Mymap<T1, T2>::get_keys_or_value(bool iskeys)
 						break;
 					}
 				}
-				if (current->left) 
+				if (current->left != nill && current->left)
 				{
 					if (iskeys) {
 						if (!list.contains(current->left->key)) 
 						{
-							current = current->right;
+							current = current->left;
 							break;
 						}
 					}
 					else if (!list.contains(current->left->value)) 
 					{
-						current = current->right;
+						current = current->left;
 						break;
 					}
 				}
 			}
 		}
-		list.save_list();
 		return list;
 	}
 	throw out_of_range("the tree does not exist!");
