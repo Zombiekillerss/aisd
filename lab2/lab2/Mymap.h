@@ -143,9 +143,12 @@ void Mymap<T1, T2>::insert(T1 newkey, T2 newvalue)
 			current->left = nill;
 			current->right = nill;
 			current->parent = previous;
-			if (newkey > previous->key)
-				previous->right = current;
-			else previous->left = current;
+			if (previous)
+			{
+				if (newkey > previous->key)
+					previous->right = current;
+				else previous->left = current;
+			}
 		}
 		else throw std::invalid_argument("Keys must be different!!");
 		while (current->parent && current->parent->parent && !current->parent->isblack)
