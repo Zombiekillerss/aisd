@@ -1,5 +1,15 @@
 #include "HuffmanTree.h"
 
+std::string HuffmanT::getcodestr()
+{
+	return codestr;
+}
+
+std::string HuffmanT::getdecodestr()
+{
+	return decodedstr;
+}
+
 void HuffmanT::encoding(std::string str)
 {
 	NodeT* newnode = nullptr;
@@ -194,6 +204,7 @@ void HuffmanT::encoding(std::string str)
 				<< (str.length() * 8) / (countelem) << endl;
 		}
 	}
+	else throw std::invalid_argument("The string cannot be empty!!");
 }
 
 HuffmanT::~HuffmanT()
