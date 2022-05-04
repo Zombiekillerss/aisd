@@ -1,27 +1,8 @@
 #include "HuffmanTree.h"
 
-void HuffmanT::insert(char newsymbol, int newvalue)
-{
-	if (!head)
-	{
-		head = new NodeT(newsymbol, newvalue);
-		listnode.push_back(head);
-		count++;
-	}
-	else
-	{
-		NodeT *current = head;
-		while (current->left)
-			current = current->left;
-		current->left = new NodeT(newsymbol, newvalue);
-		listnode.push_back(current->left);
-		count++;
-	}
-}
-
 void HuffmanT::encoding(std::string str)
 {
-	NodeT* newnode;
+	NodeT* newnode = nullptr;
 	NodeT* minnode = nullptr, *minnodesec = nullptr
 		, *savecomparison = nullptr, *savecomparisonsec = nullptr, *current = head;
 	size_t i, j;
@@ -31,33 +12,56 @@ void HuffmanT::encoding(std::string str)
 		MyList<char> listchar = charcountmap.get_keys();
 		MyList<size_t> listcount = charcountmap.get_values();
 		listnode.clear();
-		for (int k = 0; k < listchar.get_size(); k++)
+		codesym.clear();
+		codestr = "";
+		decodedstr = "";
+		for (size_t k = 0; k < listchar.get_size(); k++)
 		{
 			listnode.push_back(new NodeT(listchar.get_elem(k), listcount.get_elem(k)));
 		}
 		size_t countelem = listnode.get_size();
 		while (listnode.get_size() > 1)
 		{
-			minnodesec = listnode.get_elem(1);
+			minnodesec = listnode.get_elem(0);
 			savecomparison = minnodesec;
-			minnode = listnode.get_elem(0);
+			minnode = listnode.get_elem(1);
 			savecomparisonsec = minnode;
-			for (i = 2; i < listnode.get_size(); i++)
+			for (i = 2; i < listnode.get_size() && minnode->value != 1; i++)
 			{
 				savecomparison = listnode.get_elem(i);
-				if (savecomparison < minnode && savecomparison != minnodesec)
+				if (savecomparison->value < minnode->value && savecomparison != minnodesec)
 					minnode = savecomparison;
 			}
-			for (j = 2; j < listnode.get_size(); j++)
+			for (j = 1; j < listnode.get_size() && minnodesec->value != 1; j++)
 			{
 				savecomparisonsec = listnode.get_elem(j);
-				if (savecomparisonsec < minnodesec && savecomparisonsec != minnode)
+				if (savecomparisonsec->value < minnodesec->value && savecomparisonsec != minnode)
 					minnodesec = savecomparisonsec;
 			}
+			savecomparison = minnode;
+			savecomparisonsec = minnodesec;
 			newnode = new NodeT('\0', minnode->value + minnodesec->value);
-			minnode = new NodeT(minnode->symbol, minnode->value);
-			minnodesec = new NodeT(minnodesec->symbol, minnodesec->value);
-			if (minnode < minnodesec)
+			if (minnode->symbol == '\0')
+			{
+				minnode = new NodeT(minnode->symbol, minnode->value, minnode->left, minnode->right);
+				if (minnode->left)
+					minnode->left->root = minnode;
+				if (minnode->right)
+					minnode->right->root = minnode;
+			}
+			else minnode = new NodeT(minnode->symbol, minnode->value);
+			if (minnodesec->symbol == '\0')
+			{
+				minnodesec = new NodeT(minnodesec->symbol, minnodesec->value, minnodesec->left
+					, minnodesec->right);
+				if (minnodesec->left)
+					minnodesec->left->root = minnodesec;
+				if (minnodesec->right)
+					minnodesec->right->root = minnodesec;
+			}
+			else
+				minnodesec = new NodeT(minnodesec->symbol, minnodesec->value);
+			if (minnode->value < minnodesec->value)
 			{
 				newnode->left = minnode;
 				newnode->right = minnodesec;
@@ -69,18 +73,6 @@ void HuffmanT::encoding(std::string str)
 			}
 			minnode->root = newnode;
 			minnodesec->root = newnode;
-			if (current)
-			{
-				current->left = minnode;
-				current = current->left;
-			}
-			else
-			{
-				head = minnode;
-				current = head;
-			}
-			current->left = minnodesec;
-			current = current->left;
 			listnode.push_back(newnode);
 			listnode.removeel(savecomparison);
 			listnode.removeel(savecomparisonsec);
@@ -91,31 +83,40 @@ void HuffmanT::encoding(std::string str)
 			savecomparison = listnode.get_elem(0);
 			if (savecomparison->symbol == '\0')
 			{
-				NodeT* current = savecomparison;
+				current = savecomparison;
 				bool place = false;
 				while (countelem > codesym.get_size() && current) 
 				{
 					while (current->left) 
 					{ // moves all the way to the left and adds elements
-						arr.addNewBit(0);
 						place = false;
+						arr.addNewBit(place);
 						current = current->left;
 						if (!current->left && !current->right)
+						{
 							codesym.insert(current->symbol, arr);
+							current->iswas = true;
+						}
 					}
 					if (current->right) 
 					{
 						place = true;
-						arr.addNewBit(1);
+						arr.addNewBit(place);
 						current = current->right;
 						if (!current->left && !current->right)
+						{
 							codesym.insert(current->symbol, arr);
+							current->iswas = true;
+						}
 						continue;
 					}
-					else 
+					else
 					{
-						//if (iskeys) list.push_back(current->key);
-						//else list.push_back(current->value);
+						if (!codesym.contains(current->symbol))
+						{
+							codesym.insert(current->symbol, arr);
+							current->iswas = true;
+						}
 					}
 					while (current->root && countelem > codesym.get_size()) 
 					{
@@ -123,21 +124,15 @@ void HuffmanT::encoding(std::string str)
 						arr.deletbitend();
 						if (current->right) 
 						{
-							if (!place) 
+							if (!current->right->iswas)
 							{
-								arr.addNewBit(1);
-								current = current->right;
 								place = true;
+								arr.addNewBit(place);
+								current = current->right;
 								break;
 							}
-						}
-						if (current->left) {
-							if (place) {
-								arr.addNewBit(0);
-								current = current->left;
-								place = false;
-								break;
-							}
+							else
+								current->iswas = true;
 						}
 					}
 				}
@@ -147,19 +142,62 @@ void HuffmanT::encoding(std::string str)
 				arr.addNewBit(0);
 				codesym.insert(savecomparison->symbol, arr);
 			}
+			decodedstr = "";
+			codestr = "";
+			for (i = 0; i < str.length(); i++)
+			{
+				codestr += codesym.find(str[i]).tostring();
+				codestr += " ";
+			}
+			MyList<char> listchar = codesym.get_keys();
+			MyList<MyBitArr> listcode = codesym.get_values();
+			MyBitArr savecode;
+			countelem = 0;
+			for (i = 0; i < codestr.length(); i++)
+			{
+				if (codestr[i] == '1')
+				{
+					savecode.addNewBit(1);
+					countelem++;
+					continue;
+				}
+				else if(codestr[i] == '0')
+				{
+					savecode.addNewBit(0);
+					countelem++;
+					continue;
+				}
+				for (j = 0; j < listcode.get_size(); j++)
+				{
+					if (listcode.get_elem(j) == savecode)
+					{
+						decodedstr += listchar.get_elem(j);
+						savecode.clear();
+						break;
+					}
+				}
+			}
+			std::cout << "String: " << str << endl;
+			std::cout << "Frequency and code table" << endl;
+			for (i = 0; i < listchar.get_size(); i++)
+			{
+				std::cout << listchar.get_elem(i) << " | ";
+				std::cout << listcount.get_elem(i) << " | ";
+				std::cout << listcode.get_elem(i).tostring() << ";" << endl;
+			}
+			std::cout << "Encoding result" << endl;
+			std::cout << codestr << endl;
+			std::cout << "Decoding result" << endl;
+			std::cout << decodedstr << endl;
+			std::cout << "Compression ratio" << endl;
+			std::cout << str.length() * 8 << " / " << countelem << " = "
+				<< (str.length() * 8) / (countelem) << endl;
 		}
 	}
 }
 
 HuffmanT::~HuffmanT()
 {
-	NodeT* current = head;
-	while (head)
-	{
-		head = head->left;
-		delete current;
-		current = head;
-	}
 }
 
 Mymap<char, size_t> HuffmanT::countchars(std::string str)
@@ -182,13 +220,4 @@ size_t HuffmanT::countstr(std::string str, char ch)
 			counts++;
 	}
 	return counts;
-}
-
-bool HuffmanT::NodeT::operator<(NodeT*second)
-{
-	if (this->value < value)
-	{
-		return true;
-	}
-	return false;
 }

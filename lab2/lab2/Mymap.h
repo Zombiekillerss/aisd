@@ -6,9 +6,7 @@ template<typename T1, typename T2>
 class Mymap 
 {
 public:
-	Mymap() {};
-	Mymap(const Mymap<T1, T2>&);
-	Mymap& operator=(Mymap<T1,T2>);
+	Mymap();
 	~Mymap();
 	void insert(T1 key, T2 value);
 	void remove(T1 key);
@@ -19,6 +17,8 @@ public:
 	int get_size();
 	void clear();
 	void print();
+	Mymap(const Mymap<T1, T2>&);
+	Mymap& operator=(Mymap<T1, T2>);
 private:
 	class Node 
 	{
@@ -44,13 +44,17 @@ private:
 	Node* nill = new Node(0, T2(), true);
 	void left_turn(Node* swivel);
 	void right_turn(Node* swivel);
-	template<typename T3>
-	T3 get_keys_or_value(bool iskeys);
 };
+
+template<typename T1, typename T2>
+inline Mymap<T1, T2>::Mymap()
+{
+}
 
 template<typename T1, typename T2>
 inline Mymap<T1, T2>::Mymap(const Mymap<T1, T2>& map)
 {
+	Node* oldnill = nill;
 	head = map.head;
 	count = map.count;
 	nill = map.nill;
@@ -58,7 +62,9 @@ inline Mymap<T1, T2>::Mymap(const Mymap<T1, T2>& map)
 	MyList<T2> listt2 = get_values();
 	head = nullptr;
 	count = 0;
-	nill = nullptr;
+	if (oldnill)
+		nill = oldnill;
+	else nill = new Node(0, T2(), true);
 	for(int i =0;i<listt1.get_size();i++)
 		insert(listt1.get_elem(i),listt2.get_elem(i));
 }
@@ -97,11 +103,15 @@ void Mymap<T1, T2>::insert(T1 newkey, T2 newvalue)
 	}
 	else 
 	{
-		while (true) if (newkey > current->key && current != nill) 
+		Node* previous = nullptr;
+		while (true) if (current && newkey > current->key && current != nill)
 		{
 			if (current->right && current->right != nill)
+			{
+				previous = current;
 				current = current->right;
-			else 
+			}
+			else
 			{
 				current->right = new Node(newkey, newvalue);
 				current->right->parent = current;
@@ -111,10 +121,13 @@ void Mymap<T1, T2>::insert(T1 newkey, T2 newvalue)
 				break;
 			}
 		}
-		else if ((newkey != current->key && current != nill) || (newkey == current->key && current == nill)) 
+		else if (current && newkey != current->key && current != nill)
 		{
 			if (current->left && current->left != nill)
+			{
+				previous = current;
 				current = current->left;
+			}
 			else {
 				current->left = new Node(newkey, newvalue);
 				current->left->parent = current;
@@ -124,58 +137,75 @@ void Mymap<T1, T2>::insert(T1 newkey, T2 newvalue)
 				break;
 			}
 		}
+		else if (current && newkey == current->key && current == nill)
+		{
+			current = new Node(newkey, newvalue);
+			current->left = nill;
+			current->right = nill;
+			current->parent = previous;
+			if (newkey > previous->key)
+				previous->right = current;
+			else previous->left = current;
+		}
 		else throw std::invalid_argument("Keys must be different!!");
-		while (current->parent)
-			if (current->parent->parent && !current->parent->isblack) 
+		while (current->parent && current->parent->parent && !current->parent->isblack)
+		{
+			if (current->parent->parent->left == current->parent)
 			{
-				if (current->parent->parent->left == current->parent) 
+				if (current->parent->parent->right && !current->parent->parent->right->isblack)
 				{
-					if (current->parent->parent->right)
-						if (!current->parent->parent->right->isblack) 
-						{
-							current->parent->isblack = true;
-							current->parent->parent->right->isblack = true;
-							current->parent->parent->isblack = false;
-							current = current->parent->parent;
-						}
-					if (current->parent) 
+					current->parent->isblack = true;
+					current->parent->parent->right->isblack = true;
+					current->parent->parent->isblack = false;
+					current = current->parent->parent;
+				}
+				if (current->parent)
+				{
+					if (current->parent->isblack)
+						break;
+					if (current == current->parent->right)
+					{
+						left_turn(current);
+						current = current->left;
+					}
+					if (current->parent)
 					{
 						if (current->parent->isblack)
 							break;
-						if (current == current->parent->right) 
-						{
-							left_turn(current);
-							current = current->left;
-						}
-						if (current->parent->isblack)
-							break;
-						if (current->parent->parent) 
+						if (current->parent->parent && current->parent->parent->left == current->parent)
 						{
 							current->parent->isblack = true;
 							current->parent->parent->isblack = false;
 							right_turn(current->parent);
 						}
 					}
+					else break;
 				}
-				else if (current->parent == current->parent->parent->right) 
+				else break;
+			}
+			else if (current->parent == current->parent->parent->right && current->parent->parent->right)
+			{
+				if (current->parent->parent->left && !current->parent->parent->left->isblack)
 				{
-					if (!current->parent->parent->left->isblack) 
-					{
-						current->parent->parent->left->isblack = true;
-						current->parent->parent->right->isblack = true;
-						current->parent->parent->isblack = false;
-						current = current->parent->parent;
-					}
-					else if (current->parent->left == current) {
-						right_turn(current);
-						current = current->left;
-						current->isblack = true;
-						current->parent->isblack = false;
-						left_turn(current->parent);
-					}
+					current->parent->parent->left->isblack = true;
+					current->parent->parent->right->isblack = true;
+					current->parent->parent->isblack = false;
+					current = current->parent->parent;
+				}
+				else if (current->parent->parent->left && current->parent->left == current) {
+					right_turn(current);
+					current = current->right;
+				}
+				else break;
+				if (current->parent && current->parent->parent)
+				{
+					current->parent->isblack = true;
+					current->parent->parent->isblack = false;
+					left_turn(current->parent);
 				}
 			}
 			else break;
+		}
 		while (current->parent)
 			current = current->parent;
 		head = current;
@@ -184,7 +214,7 @@ void Mymap<T1, T2>::insert(T1 newkey, T2 newvalue)
 }
 
 template<typename T1, typename T2>
-void Mymap<T1, T2>::remove(T1 key) 
+void Mymap<T1, T2>::remove(T1 key)
 {
 	Node* current = head, * remove;
 	Node* currentforbalance = nullptr;
@@ -296,8 +326,7 @@ void Mymap<T1, T2>::remove(T1 key)
 			else 
 			{
 				current->parent->left = currentforbalance;
-				if (currentforbalance->parent)
-					currentforbalance->parent = current->parent;
+				currentforbalance->parent = current->parent;
 			}
 			if (remove->parent) 
 			{
@@ -311,6 +340,8 @@ void Mymap<T1, T2>::remove(T1 key)
 				remove->left->parent = current;
 			if (current != remove->right)
 				current->right = remove->right;
+			if (remove->right->parent != nill)
+				remove->right->parent = current;
 			current->parent = remove->parent;
 			if (!remove->parent)
 				head = current;
@@ -320,32 +351,50 @@ void Mymap<T1, T2>::remove(T1 key)
 	}
 	if (isblackremove && head && currentforbalance) 
 	{
-		while (currentforbalance->parent) {
+		while (currentforbalance->parent) 
+		{
 			if (currentforbalance->parent->left == currentforbalance) 
 			{
 				current = currentforbalance->parent->right;
 				if (current) 
 				{
-					if (!current->isblack) 
+					if (!current->isblack)
 					{
 						current->isblack = true;
 						current->parent->isblack = false;
 						left_turn(current);
 						current = currentforbalance->parent->right;
+						if (current->left && current->right)
+						{
+
+							if (current->left->isblack == current->right->isblack && current->left->isblack)
+							{
+								current->isblack = false;
+								currentforbalance = currentforbalance->parent;
+							}
+						}
+						else if (current->right && current->right->isblack)
+						{
+							current->left->isblack = true;
+							current->isblack = false;
+							right_turn(current->left);
+							current = currentforbalance->parent->right;
+						}
 					}
-					if (current->left && current->right) if (current->left->isblack == current->right->isblack && current->left->isblack) 
+					else if (current->left && current->right &&
+						current->left->isblack == current->right->isblack && current->left->isblack)
 					{
 						current->isblack = false;
 						currentforbalance = currentforbalance->parent;
 					}
-					else if (current->right->isblack) 
+					else if (current->right && current->right->isblack)
 					{
 						current->left->isblack = true;
 						current->isblack = false;
 						right_turn(current->left);
 						current = currentforbalance->parent->right;
 					}
-					else 
+					else if (current->right)
 					{
 						current->isblack = currentforbalance->parent->isblack;
 						currentforbalance->parent->isblack = true;
@@ -361,36 +410,52 @@ void Mymap<T1, T2>::remove(T1 key)
 			else 
 			{
 				current = currentforbalance->parent->left;
-				if (!current->isblack) 
+				if (current)
 				{
-					current->isblack = true;
-					current->parent->isblack = false;
-					right_turn(current);
-					current = currentforbalance->parent->left;
+					if (!current->isblack)
+					{
+						current->isblack = true;
+						current->parent->isblack = false;
+						right_turn(current);
+						current = currentforbalance->parent->left;
+						if (current->left && current->left->isblack == current->right->isblack && current->left->isblack)
+						{
+							current->isblack = false;
+							currentforbalance = currentforbalance->parent;
+						}
+						else if (current && current->right && current->right->isblack && current->left)
+						{
+							current->left->isblack = true;
+							current->isblack = false;
+							left_turn(current->left);
+							current = currentforbalance->parent->right;
+						}
+					}
+					else if (current->left && current->left->isblack == current->right->isblack 
+						&& current->left->isblack)
+					{
+						current->isblack = false;
+						currentforbalance = currentforbalance->parent;
+					}
+					else if (current && current->right && current->right->isblack && current->left)
+					{
+						current->left->isblack = true;
+						current->isblack = false;
+						right_turn(current->left);
+						current = currentforbalance->parent->right;
+					}
+					else if (current && current->right)
+					{
+						current->isblack = currentforbalance->parent->isblack;
+						currentforbalance->parent->isblack = true;
+						current->right->isblack = true;
+						right_turn(current);
+					}
+					while (current && current->parent)
+						current = current->parent;
+					head = current;
+					currentforbalance = head;
 				}
-				if (current->left->isblack == current->right->isblack && current->left->isblack) 
-				{
-					current->isblack = false;
-					currentforbalance = currentforbalance->parent;
-				}
-				else if (current->right->isblack) 
-				{
-					current->left->isblack = true;
-					current->isblack = false;
-					left_turn(current->left);
-					current = currentforbalance->parent->right;
-				}
-				else 
-				{
-					current->isblack = currentforbalance->parent->isblack;
-					currentforbalance->parent->isblack = true;
-					current->right->isblack = true;
-					right_turn(current);
-				}
-				while (current->parent)
-					current = current->parent;
-				head = current;
-				currentforbalance = head;
 			}
 			currentforbalance->isblack = true;
 		}
@@ -435,13 +500,105 @@ T2 Mymap<T1, T2>::find(T1 key)
 template<typename T1, typename T2>
 MyList<T1> Mymap<T1, T2>::get_keys() 
 {
-	return get_keys_or_value<MyList<T1>>(true);
+	if (head)
+	{
+		MyList<T1> list = MyList<T1>();
+		Node* current = head;
+		while (count > list.get_size() && current)
+		{
+			while (current->left != nill && current->left)
+			{ // moves all the way to the left and adds elements
+				list.push_back(current->key);
+				current = current->left;
+			}
+			if (current->right != nill && current->right)
+			{
+				list.push_back(current->key);
+				current = current->right;
+				continue;
+			}
+			else
+			{
+				list.push_back(current->key);
+			}
+			while (current->parent && count > list.get_size())
+			{
+				current = current->parent; // goes to the root
+				if (current->right != nill && current->right)
+				{
+					if (!list.contains(current->right->key))
+					{
+						current = current->right;
+						break;
+					}
+				}
+				if (current->left != nill && current->left)
+				{
+					if (!list.contains(current->left->key))
+					{
+						current = current->left;
+						break;
+					}
+				}
+			}
+		}
+		return list;
+	}
+	throw out_of_range("the tree does not exist!");
 }
 
 template<typename T1, typename T2>
 MyList<T2> Mymap<T1, T2>::get_values() 
 {
-	return get_keys_or_value<MyList<T2>>(false);
+	if (head)
+	{
+		MyList<T2> list = MyList<T2>();
+		MyList<T1> flaglist = MyList<T1>();
+		Node* current = head;
+		while (count > list.get_size() && current)
+		{
+			while (current->left != nill && current->left)
+			{ // moves all the way to the left and adds elements
+				list.push_back(current->value);
+				flaglist.push_back(current->key);
+				current = current->left;
+			}
+			if (current->right != nill && current->right)
+			{
+				list.push_back(current->value);
+				flaglist.push_back(current->key);
+				current = current->right;
+				continue;
+			}
+			else
+			{
+				list.push_back(current->value);
+				flaglist.push_back(current->key);
+			}
+			while (current->parent && count > list.get_size())
+			{
+				current = current->parent; // goes to the root
+				if (current->right != nill && current->right)
+				{
+					if (!flaglist.contains(current->right->key))
+					{
+						current = current->right;
+						break;
+					}
+				}
+				if (current->left != nill && current->left)
+				{
+					if (!flaglist.contains(current->left->key))
+					{
+						current = current->left;
+						break;
+					}
+				}
+			}
+		}
+		return list;
+	}
+	throw out_of_range("the tree does not exist!");
 }
 
 template<typename T1, typename T2>
@@ -491,15 +648,17 @@ void Mymap<T1, T2>::left_turn(Node* swivel)
 }
 
 template<typename T1, typename T2>
-void Mymap<T1, T2>::right_turn(Node* swivel) 
+void Mymap<T1, T2>::right_turn(Node* swivel)
 {
-	Node* parent = swivel->parent;
+	Node* parent = nullptr;
+	parent = swivel->parent;
 	parent->left = swivel->right;
-	if (swivel->right != nill) swivel->right->parent = parent;
+	if (swivel->right != nill)
+		swivel->right->parent = parent;
 	swivel->parent = parent->parent;
 	if (!parent->parent)
 		head = swivel;
-	else 
+	else
 	{
 		if (parent == parent->parent->right)
 			parent->parent->right = swivel;
@@ -508,73 +667,4 @@ void Mymap<T1, T2>::right_turn(Node* swivel)
 	}
 	parent->parent = swivel;
 	swivel->right = parent;
-}
-
-template<typename T1, typename T2>
-template<typename T3>
-T3 Mymap<T1, T2>::get_keys_or_value(bool iskeys) 
-{
-	if (head) 
-	{
-		T3 list;
-		Node* current = head;
-		while (count > list.get_size() && current) 
-		{
-			while (current->left != nill && current->left) 
-			{ // moves all the way to the left and adds elements
-				if (iskeys) list.push_back(current->key);
-				else list.push_back(current->value);
-				current = current->left;
-			}
-			if (current->right != nill && current->right) 
-			{
-				if (iskeys) list.push_back(current->key);
-				else list.push_back(current->value);
-				current = current->right;
-				continue;
-			}
-			else 
-			{
-				if (iskeys) list.push_back(current->key);
-				else list.push_back(current->value);
-			}
-			while (current->parent && count > list.get_size()) 
-			{
-				current = current->parent; // goes to the root
-				if (current->right != nill && current->right) 
-				{
-					if (iskeys) 
-					{
-						if (!list.contains(current->right->key)) 
-						{
-							current = current->right;
-							break;
-						}
-					}
-					else if (!list.contains(current->right->value)) 
-					{
-						current = current->right;
-						break;
-					}
-				}
-				if (current->left != nill && current->left)
-				{
-					if (iskeys) {
-						if (!list.contains(current->left->key)) 
-						{
-							current = current->left;
-							break;
-						}
-					}
-					else if (!list.contains(current->left->value)) 
-					{
-						current = current->left;
-						break;
-					}
-				}
-			}
-		}
-		return list;
-	}
-	throw out_of_range("the tree does not exist!");
 }

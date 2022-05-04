@@ -12,7 +12,20 @@ MyBitArr::MyBitArr(const MyBitArr& bitarr)
 
 void MyBitArr::addNewBit(bool newBit) 
 {
-	boolArr.push_front(newBit);
+	boolArr.push_back(newBit);
+}
+
+std::string MyBitArr::tostring()
+{
+	std::string str;
+	for (int i = 0; i < boolArr.get_size(); i++)
+	{
+		if (boolArr.get_elem(i))
+			str += "1";
+		else
+			str += "0";
+	}
+	return str;
 }
 
 void MyBitArr::deletbitend()

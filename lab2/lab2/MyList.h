@@ -103,6 +103,7 @@ void MyList<T>::pop_back()
         }
         delete current; // clears memory 
         current = nullptr;
+        end = previous;
         if (previous) previous->next = current; // updates the pointer
         else head = nullptr;
         size--;

@@ -7,6 +7,7 @@ public:
 	~MyBitArr();
 	MyBitArr(const MyBitArr&);
 	void addNewBit(bool);
+	std::string tostring();
 	void deletbitend();
 	void clear();
 	bool operator== (MyBitArr);
