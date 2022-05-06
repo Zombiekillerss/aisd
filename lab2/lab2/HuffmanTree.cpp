@@ -152,8 +152,6 @@ void HuffmanT::encoding(std::string str)
 				arr.addNewBit(0);
 				codesym.insert(savecomparison->symbol, arr);
 			}
-			decodedstr = "";
-			codestr = "";
 			for (i = 0; i < str.length(); i++)
 			{
 				codestr += codesym.find(str[i]).tostring();
@@ -201,7 +199,7 @@ void HuffmanT::encoding(std::string str)
 			std::cout << decodedstr << endl;
 			std::cout << "Compression ratio" << endl;
 			std::cout << str.length() * 8 << " / " << countelem << " = "
-				<< (str.length() * 8) / (countelem) << endl;
+				<< (float)((str.length() * 8) / (float)(countelem)) << endl;
 		}
 	}
 	else throw std::invalid_argument("The string cannot be empty!!");
