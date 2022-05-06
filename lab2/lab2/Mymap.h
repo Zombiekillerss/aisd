@@ -411,7 +411,7 @@ void Mymap<T1, T2>::remove(T1 key)
 					}
 					while (current && current->parent && current != nill)
 						current = current->parent;
-					if (current != nill)
+					if(current != nill)
 						head = current;
 					currentforbalance = head;
 				}
