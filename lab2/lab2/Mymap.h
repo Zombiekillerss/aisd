@@ -430,12 +430,12 @@ void Mymap<T1, T2>::remove(T1 key)
 							right_turn(current);
 						}
 						current = currentforbalance->parent->left;
-						if (current->left && current->left->isblack == current->right->isblack && current->left->isblack)
+						if (current->left && current->right && current->left->isblack == current->right->isblack && current->left->isblack)
 						{
 							current->isblack = false;
 							currentforbalance = currentforbalance->parent;
 						}
-						else if (current && current->right && current->right->isblack && current->right
+						else if (current && current->right && current->left && current->right->isblack && current->right
 							&& current->right != nill)
 						{
 							current->left->isblack = true;
