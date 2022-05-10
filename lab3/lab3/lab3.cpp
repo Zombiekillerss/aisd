@@ -4,8 +4,7 @@
 int main()
 {
     Floyd f;
-    string str = f.cheapway("3", "3");
-    f.print_matrix();
+    string str = f.cheapway("4", "1", "data.txt");
     cout << str;
     return 0;
 }

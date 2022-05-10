@@ -1,5 +1,7 @@
 #pragma once
 #include "MyList.h"
+#include <iostream>
+#include <fstream>
 
 class Floyd {
 public:
@@ -12,8 +14,7 @@ private:
 	{
 		bool isinf = false;
 		int value = 0;
-		int coor[2] = { 0, 0 };
-		int intermediate;
+		int intermediate = -1;
 	};
 	Elem** matrix = nullptr;
 	MyList<string> namecol;

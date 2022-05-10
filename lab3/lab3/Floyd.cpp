@@ -1,6 +1,4 @@
 #include "Floyd.h"
-#include <iostream>
-#include <fstream>
 
 Floyd::Floyd()
 {
@@ -61,6 +59,7 @@ string Floyd::cheapway(string start, string end, string pathtofile)
 
 void Floyd::print_matrix()
 {
+	cout << endl << "Modified matrix" << endl;
 	for (int i = 0; i < size; i++)
 	{
 		for (int j = 0; j < size; j++)
@@ -107,8 +106,6 @@ void Floyd::writefromfile(string pathtofile)
 			matrix[i] = new Elem[size];
 			for (int j = 0; j < size; j++)
 			{
-				matrix[i][j].coor[0] = i;
-				matrix[i][j].coor[1] = j;
 				matrix[i][j].intermediate = -1;
 			}
 		}
@@ -140,6 +137,17 @@ void Floyd::writefromfile(string pathtofile)
 					else matrix[col][row].value = atoi(sum.c_str());
 				}
 				newoldstr = "";
+			}
+			cout << "Adjacency matrix" << endl;
+			for (int i = 0; i < size; i++)
+			{
+				for (int j = 0; j < size; j++)
+				{
+					if (!matrix[i][j].value)
+						cout << "0 ";
+					else cout << "1 ";
+				}
+				cout << endl;
 			}
 			file.close();
 		}
