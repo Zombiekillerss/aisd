@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{22b233ab-aa3f-420f-9960-5046ea4a6349}</ProjectGuid>
-    <RootNamespace>lab3</RootNamespace>
+    <ProjectGuid>{17def91e-5e12-4cdd-b367-ff9cabcbf94a}</ProjectGuid>
+    <RootNamespace>kyr</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -139,11 +139,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Floyd.cpp" />
-    <ClCompile Include="lab3.cpp" />
+    <ClCompile Include="Fulkerson.cpp" />
+    <ClCompile Include="kyr.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Floyd.h" />
+    <ClInclude Include="Fulkerson.h" />
     <ClInclude Include="MyList.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
