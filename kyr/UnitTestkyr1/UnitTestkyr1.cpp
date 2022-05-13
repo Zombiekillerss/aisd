@@ -23,15 +23,24 @@ namespace UnitTestkyr1
 				Assert::AreEqual("You entered the data incorrectly or the file was not found!!", e.what());
 			}
 		}
-		TEST_METHOD(Test)
+		TEST_METHOD(ExamplesTest)
 		{
+			/*
+			* lecture example
+			*/
 			Fulkerson f;
-			int sum = 0;
+			int sum = 0, expected = 3;
 			sum = f.maxflow("example1.txt");
-			std::cout << endl << "Maximum flow: " << sum << endl;
+			Assert::AreEqual(expected, sum);
+			expected = 10;
+			/*
+			 example from here https://habr.com/ru/post/566248/ 
+				in 2 variations: when rows and columns are in one position and another
+			*/
 			sum = f.maxflow("example2.txt");
-			std::cout << endl << "Maximum flow: " << sum << endl;
+			Assert::AreEqual(expected, sum);
 			sum = f.maxflow("example3.txt");
+			Assert::AreEqual(expected, sum);
 		}
 	};
 }
